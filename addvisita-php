@@ -1,0 +1,41 @@
+<?php
+//revisar insercion codigo html
+$varstr = stripos($_POST['comentario'], "<");
+$varstr2 = stripos($_POST['nombrevisita'], "<");
+if ($varstr !== false){
+	echo " 
+                <script language=’JavaScript’> 
+                alert(‘No se permite introducir etiquetas html’); 
+                </script>";
+	header("Location: index.html#book");
+	exit;
+	
+	}
+elseif ($varstr2 !== false){
+	echo " 
+                <script language=’JavaScript’> 
+                alert(‘No se permite introducir etiquetas html’); 
+                </script>";
+	header("Location: index.html#book");
+	exit;
+	
+}
+else{
+//contar visitas existentes
+$datosvisitas = simplexml_load_file("librovisitas.xml");
+$numvis = $datosvisitas->count();
+//añadir dato a xml
+$fecha = date('d/m/Y');
+$visitas = new SimpleXMLElement('librovisitas.xml', null, true);
+$not = $visitas->addChild('visita');
+$not->addChild('key',$numvis+1);
+$not->addChild('nombrecliente',$_POST['nombrevisita']);
+$not->addChild('fecha', $fecha);
+$not->addChild('comentario', $_POST['comentario']);
+$not->addChild('valoracion', $_POST['valoracion']);    
+
+$visitas->asXML('librovisitas.xml'); 
+
+header("Location: index.html#book");
+exit;}
+?>
