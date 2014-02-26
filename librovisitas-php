@@ -1,0 +1,76 @@
+<?php
+//comprobamos pagina
+if (empty($_GET['paginalibro'])){
+	$pagina = 1;}
+	else  {
+	$pagina = $_GET['paginalibro'];}
+	
+//leemos los datos
+$datosvisitas = simplexml_load_file("librovisitas.xml");
+$xmlstring = file_get_contents("librovisitas.xml");
+$datos = new SimpleXMLElement($xmlstring);
+
+//variables generales
+$numvis = $datosvisitas->count();
+$numen = round(($numvis / 3)+0.5);
+$varR = ($numen*3)-$numvis;
+
+
+// buscando visitas según pagina
+
+if ($pagina < 2){
+	$varpag1 = $numvis;}
+	else {
+		$varpag1 = $numvis - ($pagina-1)*3;}
+	
+	$varpag2 = $varpag1-3;
+
+while ( $varpag1 > $varpag2 ){
+
+$visitaarr= $datos->xpath('visita/key[. ="' . "$varpag1" . '"]/parent::*');
+$array = json_decode(json_encode($visitaarr), TRUE);
+
+//adquiriendo valores
+$nombrecliente = array_column($array, 'nombrecliente');
+$nombrecliente = implode ($nombrecliente);
+$fecha = array_column($array, 'fecha');
+$fecha = implode ($fecha);
+$comentario = array_column($array, 'comentario');
+$comentario = implode ($comentario);
+$valoracion = array_column($array, 'valoracion');
+$valoracion = implode ($valoracion);
+if ($varpag1<1){break;}
+
+//mostrando resultado
+	echo '	
+		<div style="color:#FFF; border-bottom:1px solid #999; font-size:1.2em;" >
+		<h4>'.$nombrecliente.'</h4>
+		<p><i>'.$fecha.'</i></p>
+		<p>'.$comentario.'</p>
+		<img src="images/'.$valoracion.'"></img>
+		</br>		
+		</div>
+		';
+//reduciendo bucle while		
+$varpag1 = $varpag1 - 1;
+}
+//vaciando variables
+	unset($nombreclientevisita);
+	unset($fechavisita);
+	unset($comentariovisita);
+	unset($valoracionvisita);
+
+//creando enlaces paginas visitas
+if ($numvis > 3){
+	
+	$enlace = 0;
+	echo '<br><tr><td><i style="color:#FFF; font-size:1.2em;">Página </i></td>';
+	while ($numen >= 1){
+		$enlace = $enlace+1;
+		$numen = $numen-1;
+		echo '<td><a href="librovisitas.php?paginalibro='.$enlace.'" style="color:#FFF; font-size:1.2em">'.$enlace.' </a></td>';}
+	echo '</tr>';
+		
+	
+}
+?>
